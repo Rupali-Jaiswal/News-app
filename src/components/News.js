@@ -1,74 +1,92 @@
-import React, { Component } from 'react'
+import React from 'react'
 import NewsItms from './NewsItms'
 import Navbar from './Navbar'
 import Loading from './Loading';
-import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom';
+import { a } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
-export class News extends Component {
-    static defaultProps={
-        category:'general',
-        title:'Top Headlines'
-    }
-    static propTypes = {
-    }
-    constructor() {
-        super();
-        this.state = {
-            articles: [],
-            page:1,
-            loading:true
-        }
-    }
-    async componentDidMount() {
-        let url = `https://newsapi.org/v2/top-headlines?country=in&category=${this.props.category}&apiKey=1589668a8f794e4d8822352e6a2afd2c&page=${this.state.page}&pageSize=24`
+const News = (props) => {
+    const [articles, setarticles] = useState([])
+    const [loading, setloading] = useState(false)
+    const [Page, setPage] = useState(1)
+    const [title, settitle] = useState("TOP-HEADLINES")
+    useEffect(() => {
+        update()
+    }, [])
+
+
+    const update = async () => {
+        setloading(true)
+        let url = `https://newsapi.org/v2/top-headlines?country=in&category=${props.category}&apiKey=1589668a8f794e4d8822352e6a2afd2c&page=${Page}&pageSize=30`
         let data = await fetch(url)
         let jsondata = await data.json()
-        this.setState({ articles: jsondata.articles, loading:false })
+        setarticles(jsondata.articles)
+        setloading(false)
+        settitle(props.title)
     }
     
-    pageChnge= async (p)=> {
-        this.setState({loading:true})
-        let url = `https://newsapi.org/v2/everything?q=keyword&apiKey=1589668a8f794e4d8822352e6a2afd2c&page=${p}&pageSize=24`
+    const pageChnge = async (p) => {
+        setloading(true)
+        let url = `https://newsapi.org/v2/everything?q=keyword&apiKey=1589668a8f794e4d8822352e6a2afd2c&page=${p}&pageSize=30`
         let data = await fetch(url)
         let jsondata = await data.json()
-        this.setState({ articles: jsondata.articles ,page:p,loading:false})
+        setarticles(jsondata.articles)
+        setloading(false)
+        setPage(p)
     }
-    searchTopic=async(value)=>{
-        this.setState({loading:true})
+    const searchTopic = async (value) => {
+        setloading(true)
         let url = `https://newsapi.org/v2/everything?q=${value}&apiKey=1589668a8f794e4d8822352e6a2afd2c&pageSize=24`
         let data = await fetch(url)
         let jsondata = await data.json()
-        this.setState({ articles: jsondata.articles ,loading:false})
+        setarticles(jsondata.articles)
+        setloading(false)
+        settitle(value)
     }
-    render() {
-        return (
-          <div>
-            <Navbar searchTopic={this.searchTopic}/>
-            <div className="container my-3">
-                <h1 className='mt-4'>{this.props.title}</h1>
-                {this.state.loading && <Loading/>}
-                <div className="row">
-                    {this.state.articles.map((x) => {
-                        return <div className="col-md-4 my-3" key={x.url}>
-                            <NewsItms urlToImage={x.urlToImage ? x.urlToImage : "https://source.unsplash.com/random/200x200?sig=1"} discription={(x.description && x.description != "[Removed]") ? x.description.slice(0, 60) : "See the Geminid meteor shower 2023 light up the sky in these amazing photos - Space.com".slice(0, 90)} title={(x.title && x.title != "[Removed]") ? x.title.slice(0, 40) : "The meteor shower continues through the weekend.".slice(0, 40)} url={x.url ? x.url : "https://www.space.com/geminid-meteor-shower-amazing-photos-december-2023"} />
-                        </div>
-                    })
-                    }
+    const NextPage=()=>{
+         if(Page*24<articles.length())
+         return false
+        else
+        return true
+    }
+    return (
+        <div>
+            <Navbar searchTopic={searchTopic} />
+            <div className="container">
+                <h1 style={{ display: "flex", justifyContent: "center", marginTop: "70px" }}>{title}</h1>
+                {loading && <Loading />}
+                <div className="container">
+                    <div className="row">
+                        {articles.map((x) => {
+                            return <div className="col-md-4 my-3" key={x.url}>
+                                <NewsItms urlToImage={x.urlToImage ? x.urlToImage : "https://source.unsplash.com/random/200x200?sig=1"} discription={(x.description && x.description != "[Removed]") ? x.description.slice(0, 90) : "See the Geminid meteor shower 2023 light up the sky in these amazing photos - Space.com".slice(0, 90)} title={(x.title && x.title != "[Removed]") ? x.title.slice(0,80) : "The meteor shower continues through the weekend.".slice(0, 80)} url={x.url ? x.url : "https://www.space.com/geminid-meteor-shower-amazing-photos-december-2023"} />
+                            </div>
+                        })
+                        }
+                    </div>
                 </div>
-                {!this.state.loading &&<nav aria-label="Page navigation example" style={{display:"flex", justifyContent:"center"}}>
-                    <ul className="pagination">
-                        <li className="page-item" style={{ pointerEvents: this.state.page === 1 ? "none" : "auto"}}><Link className="page-link" to="#" onClick={this.state.page==1? null:()=>{this.pageChnge(this.state.page-1)}}>previous</Link></li>
-                        <li className="page-item"><Link className="page-link" to="#" onClick={()=>{this.pageChnge(1)}}>1</Link></li>
-                        <li className="page-item"><Link className="page-link" to="#" onClick={()=>{this.pageChnge(2)}}>2</Link></li>
-                        <li className="page-item"><Link className="page-link" to="#" onClick={()=>{this.pageChnge(3)}}>3</Link></li>
-                        <li className="page-item"><Link className="page-link" to="#" onClick={()=>{this.pageChnge(this.state.page+1)}}>Next</Link></li>
+                {!loading && <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+                        <li class={Page==1? "page-item disabled":"page-item"}>
+                            <a class="page-link" href='#' onClick={Page == 1 ? null : () => { pageChnge(Page - 1)}}>Previous</a>
+                        </li>
+                        <li class={Page==1? "page-item active":"page-item"}><a class="page-link" href="#" onClick={() => { pageChnge(1) }}>1</a></li>
+                        <li class={Page==2? "page-item active":"page-item"}>
+                            <a class="page-link" href="#" onClick={() => { pageChnge(2) }}>2</a>
+                        </li>
+                        <li class={Page==3? "page-item active":"page-item"}><a class="page-link" onClick={() => { pageChnge(3) }} href="#">3</a></li>
+                        <li class={Page==3?"page-item disabled":"page-item" }>
+                            <a class="page-link" onClick={() => { pageChnge(Page + 1) }} href="#">Next</a>
+                        </li>
                     </ul>
                 </nav>}
             </div >
-          </div>
-        )
-    }
+        </div>
+    )
 }
 
 export default News
+News.defaultProps = {
+    category: 'general',
+    title: 'Top Headlines'
+}
