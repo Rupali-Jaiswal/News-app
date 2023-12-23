@@ -13,7 +13,7 @@ import {
       <Routes>
           <Route exact path='/' element={<News category="general" title="Top Headlines"/>} />
           <Route exact path='/business' element={<News category="business"title="Bussiness Related" />} />
-          <Route exact path='/entertainment' element={<News category="entertainment"title="Entertinment Realated" />} />
+          <Route exact path='/entertainment' element={<News category="entertainment"title="Entertainment Realated" />} />
           <Route exact path='/sports' element={<News category="sports"title="Sports Related" />} />
           <Route exact path='/health' element={<News category="health"title="Health Related" />} />
           <Route exact path='/technology' element={<News category="technology" title="Technology Related"/>} />

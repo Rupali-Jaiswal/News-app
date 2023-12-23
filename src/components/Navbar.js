@@ -10,7 +10,8 @@ export default function Navbar(props) {
 
   const handleSearch = (e) => {
     e.preventDefault(); // Prevent form submission
-    props.searchTopic(searchValue); // Call the searchTopic function with the search value
+    searchValue==='' ? alert("Please enter the topic you want to search"): props.searchTopic(searchValue); 
+   // Call the searchTopic function with the search value
   };
 
   return (
@@ -44,7 +45,7 @@ export default function Navbar(props) {
         }>
           <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" value={searchValue}
             onChange={handleInputChange} />
-          <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Search</button>
+          <a href="#"><button class="btn btn-outline-dark my-2 my-sm-0" type="submit">search</button></a>
         </form>
       </div>
     </nav></div>
